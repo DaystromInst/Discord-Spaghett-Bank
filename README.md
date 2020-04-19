@@ -63,6 +63,8 @@ Custom help command. Messages the channel with command instructions.
 
 ### stimulus(ctx)
 
+![Meanwhile at Jerome Powell's coke house](https://www.google.com/url?sa=i&url=https%3A%2F%2Fknowyourmeme.com%2Fmemes%2Fmoney-printer-go-brrr&psig=AOvVaw0EKl4D-rJpE_z6_Hd76Kvh&ust=1587347845090000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJCL5Nax8-gCFQAAAAAdAAAAABAg)
+
 ctx: Context object
 
 Admin only command. Inflates the economy, generating an amount of spaghett and putting it into the mentioned account.
@@ -106,7 +108,7 @@ Calls ledger() then closes the client and logs the bot out of discord.
 
 ## deposit
 
-`deposit `
+`~deposit @<user to pay> <integer amount being paid>`
 
 ## stimulus
 
