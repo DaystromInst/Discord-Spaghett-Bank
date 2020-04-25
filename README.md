@@ -1,7 +1,8 @@
 **WHEN GENERATING THE OAUTH2 LINK, THE APPLICATION SHOULD HAVE ADMIN PERMISSIONS**
 
+# Main.py
 
-# Global Variables/Files
+## Global Variables/Files
 ---
 
 ### **BankBook.json**
@@ -13,13 +14,16 @@ Json file, stores the wallet information.
 
 
 ### **data**
-
 Dictionary object to store info from BankBook.json
 
 ### **TOKEN**
-
 Const string stores the bot token
 
+### **level_info**
+Dictionary object to store mining info from leveling.json.
+
+### **casino**
+Object of Gamble class.
 
 # Basic Functions
 ---
@@ -59,6 +63,14 @@ Basic event. Pulls info from BankBook.json into data and prints to the console t
 ctx: Context object
 
 Custom help command. Messages the channel with command instructions.
+
+
+### slots(ctx)
+ctx: Context object
+
+Parses out the wager and plants it in the Gamble object.
+Subtracts the wager from the user's wallet entry and calls Gamble.roll_slots(player id).
+Reacts based on the results.
 
 
 ### stimulus(ctx)
@@ -103,17 +115,62 @@ Calls ledger() then closes the client and logs the bot out of discord.
 ---
 
 ## debt
-
 `~debt @<the user to tax> <the integer amount of the debt>`
 
 ## deposit
-
 `~deposit @<user to pay> <integer amount being paid>`
 
 ## stimulus
-
 `~stimulus @<the user to pay> <integer amount to be paid>`
+
+## slots
+`~slots <integer spaghett wager>`
 
 in general, the command syntax is `~<command>`
 
 commands not listed in this section take no arguments and therefore can simply be invoked by their name preceded by a tilde (`~`).
+
+---
+
+# Gambler.py (Class Gamble)
+---
+`self.bets` -> holds wagers keyed to the ID of the users who placed them
+
+## Methods
+
+### `setBet(self, wager, user)`
+    Inserts the wager into self.bets and sets the key to user.
+
+### `get_bet(self, user)`
+    Simple getter method for wagers.
+
+### `roll_slots(self, user)`
+    First checks if a bet exists for the user.
+    If `None`, returns an error message
+
+    Rolls 3 random integers 0 - 9 (inclusive)
+    If they all match, the player wins.
+
+    *Returns: (winnings or 0), result message, list of numbers rolled*
+
+# Extra Files
+
+## These files aren't included in git for privacy reasons. However they are very necessary so you *will* need to write them.
+---
+
+## leveling.json
+- Main keys are user IDs.
+- Each entry holds another dictionary with keys `time`, `xp`, and `level`.
+- `time`: Holds a stringified version of a datetime object containing a time in `"%X"` format.
+- `xp`: Holds a float with the amount of xp accrued.
+
+
+## BankBook.json
+- Main keys are also user IDs
+- Each entry holds another dictionary with keys `"name"` and `"balance"`
+- `"name"`: The individual's display name as a string. Not important but it's there.
+- `"balance"`: The spaghett balance as an int.
+
+
+## token.txt
+Simply for holding the app token.

@@ -3,12 +3,10 @@ from typing import Tuple, Dict, Any
 
 class Gamble:
 
-    # Holds wagers keyed to user IDs
-    bets = dict()
-
-
     def __init__(self):
-        a = 0 # filler
+        # Holds wagers keyed to user IDs
+        self.bets = dict()
+        self.cards = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 
 
     def setBet(self, wager, user):
@@ -30,8 +28,11 @@ class Gamble:
                 rolls.append(random.randint(0,9))
 
             if rolls[0] == rolls[1] and rolls[1] == rolls[2]:
-                return 1, (bets[user] * 2)
+                return (bets[user] * 2), "You won-a! Congradyulasiones!", rolls
             else:
-                return 0, 0
+                return 0, "Mama mia! You-a lost-a!", rolls
         else:
-            return 2, 0
+            rolls.append(0)
+            rolls.append(0)
+            rolls.append(0)
+            return 0, "You-a stupido! You place-a no bet-a!", rolls
