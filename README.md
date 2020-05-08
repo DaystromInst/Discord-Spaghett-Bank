@@ -22,7 +22,7 @@ Json file that holds wallet info for each user.
 - `"name"`: The individual's display name as a string. Not very important but it's there if you need it.
 - `"balance"`: The user's spaghett balance as an int.
 
-## SETTING.INI
+## `SETTINGS.INI`
 simple ini file that sets a lot of default values.
 the first and only header is `[DEFAULT]`, and it has the following entries:
     - `roleCap`: The int position of the role that you want to serve as the cap. Otherwise people could buy admin roles. To find out what this number should be, go into your server and count every role going up with `@everyone` being 0.
