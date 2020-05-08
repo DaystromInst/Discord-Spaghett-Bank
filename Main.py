@@ -3,6 +3,7 @@ from discord.ext import commands
 import discord.guild
 
 import json
+import configparser
 from datetime import datetime, timedelta, time, tzinfo
 from typing import Tuple, Dict, Any
 from Gambler import Gamble
@@ -15,7 +16,11 @@ client.remove_command('help')
 data = dict()
 level_info = dict()
 identify = []
+movies = []
 casino = Gamble()
+
+PRICES = dict()
+role_cap = 0
 
 
 def parse_payment(message):  # Returns payment amount from command
@@ -36,9 +41,24 @@ def ledger():
         json.dump(level_info, leveling)
         leveling.close()
 
+    with open("movielist.txt", 'w') as movielist:
+        global movies
+        movielist.writelines(movies)
+        movielist.close()
+
 
 @client.event
 async def on_ready():
+    config = configparser.ConfigParser()
+    config.read('SETTINGS.INI')
+
+    global role_cap
+    role_cap = int(config['DEFAULT']['roleCap'])
+    global PRICES
+    PRICES['name'] = int(config['DEFAULT']['name'])
+    PRICES['role'] = int(config['DEFAULT']['role'])
+    PRICES['movie'] = int(config['DEFAULT']['movie'])
+
     with open("BankBook.json") as bankbook:
         global data
         data = json.load(bankbook)
@@ -53,6 +73,11 @@ async def on_ready():
         global identify
         identify = ban.readlines()
         ban.close()
+
+    with open("movielist.txt", 'r') as movielist:
+        global movies
+        movies = movielist.readlines()
+        movielist.close()
 
     print("Setup is complete!")
 
@@ -99,14 +124,14 @@ async def slots(ctx):
 
     casino.setBet(amount, player)
     winnings, end_msg, results = casino.roll_slots(player)
-    ctx.message.channel.send("You-a rolled and got-a {}", results)
+    await ctx.message.channel.send("You-a rolled and got-a {}", results)
 
 
     if winnings > 0:
-        ctx.message.channel.send(end_msg)
+        await ctx.message.channel.send(end_msg)
         data[player]['balance'] += int(winnings)
     else:
-        ctx.message.channel.send(end_msg)
+        await ctx.message.channel.send(end_msg)
 
     ledger()
 
@@ -120,6 +145,70 @@ async def help(ctx):
 
 
 @client.command(pass_context=True)
+async def role(ctx):
+    user = str(ctx.message.author.id)
+    chan = ctx.message.channel
+    global data
+    global PRICES
+    global roleCap
+
+    startBal = data[user]['balance']
+
+    # Take the spaghett and assign new role
+    if data[user]['balance'] >= int(PRICES['role']):
+        base_role = ctx.author.top_role
+
+        for thing in ctx.guild.roles:
+            if base_role >= roleCap:
+                await chan.send("You stupido! You're already at-a the top-a!")
+                break
+
+            if thing.position > base_role.position:
+                await ctx.author.remove_roles(base_role)
+                await ctx.author.add_roles(thing)
+                data[user]['balance'] -= int(PRICES['role'])
+
+                if data[user]['balance'] == startBal:
+                    print("Spaghett was not deducted in role purchase")
+
+                break
+            else:
+                continue
+    else:
+        chan.send("You don't-a have enough-a spaghett!")
+
+    ledger()
+
+
+@client.command(pass_context=True)
+async def nickname(ctx):
+    global PRICES
+    global data
+    content = ctx.message.content.split(" ")
+
+    if data[user]['balance'] >= PRICES['name']:
+        newName = " "
+        word = 0
+        while True:
+            if i == 0:
+                continue
+            elif i == len(content):
+                newName += content[i]
+                break
+            elif i == 1:
+                newName = content[i]+" "
+            else:
+                newName += content[i]+" "
+            i += 1
+        await ctx.author.edit(nick=new_name)
+        data[user]['balance'] -= PRICES['name']
+    else:
+        await chan.send("You don't-a have enough-a spaghett!")
+
+    ledger()
+
+
+@client.command(pass_context=True)
 @commands.has_permissions(administrator=True)
 async def stimulus(ctx):
     content = ctx.message.content.split(" ")
@@ -127,7 +216,7 @@ async def stimulus(ctx):
     try:
         recipient = str(ctx.message.mentions[0].id)
     except:
-        print("Line 89 didn't work\n")
+        print("Line 149 didn't work\n")
 
     if recipient in data.keys():
         data[recipient]['balance'] += int(amount)
@@ -191,10 +280,10 @@ async def leave(ctx):
 
 
 def get_Token():
-    key = open("token.txt", "r")
     global TOKEN
-    TOKEN = key.readline()
-    key.close()
+    config = configparser.ConfigParser()
+    config.read('SETTINGS.INI')
+    TOKEN = config['DEFAULT']['token']
 
 
 get_Token()
@@ -204,7 +293,7 @@ client.run(TOKEN)
 #		USES FOR SPAGHETT
 #	[] Earn Papa's respect
 #	[] Change your nickname
-#	[] Climb the ranks
+#	[*] Climb the ranks
 #       [] Betting/Gambling
 #		[] lottery
 #		[] rng (roulette, slots)
@@ -215,7 +304,7 @@ client.run(TOKEN)
 #		[] Petty bets ("I bet 20 spaghett that billy is gonna fuck up as thatcher.")
 #	[] Stonks
 #		HOW TO GET SPAGHOOTIES
-#	[] Text chat (like level/rank gaining in MEE6)
+#	[*] Text chat (like level/rank gaining in MEE6)
 #	[*] Stimulus from admins (Money printer go brrrrrrrrrrrr)
 #	[*] payment from others
 #	[] Gambling

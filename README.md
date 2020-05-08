@@ -1,5 +1,38 @@
 **WHEN GENERATING THE OAUTH2 LINK, THE APPLICATION SHOULD HAVE ADMIN PERMISSIONS**
 
+# Setup Guide
+
+## To properly run this bot, there are some files that you will need to create and configure. I couldn't include mine in git for privacy reasons so I'll help you set them up!
+
+
+## `leveling.json`
+json file that holds all of the spaghett earning info for the users.
+
+- Main keys are stringified user IDs. When I mean user IDs I don't mean screen names. You can get your own user ID by right clicking on your username in a server and selecting `Copy ID` at the very bottom. I recommend using your own ID as the first key because every user thereafter will be automatically given their own key.
+- Each entry holds another dictionary with keys `time`, `xp`, and `level`
+- `time`: Holds a stringified version of a datetime object containing a time in `"%X"` format.
+- `xp`: Holds a float with the amount of accumulated xp.
+
+
+## `BankBook.json`
+Json file that holds wallet info for each user.
+
+- The main keys here are also user IDs.
+- Each entry holds a dictionary with keys `"name"` and `"balance`.
+- `"name"`: The individual's display name as a string. Not very important but it's there if you need it.
+- `"balance"`: The user's spaghett balance as an int.
+
+## SETTING.INI
+simple ini file that sets a lot of default values.
+the first and only header is `[DEFAULT]`, and it has the following entries:
+    - `roleCap`: The int position of the role that you want to serve as the cap. Otherwise people could buy admin roles. To find out what this number should be, go into your server and count every role going up with `@everyone` being 0.
+    - `name`: The price for buying a new nickname
+    - `movie`: The price for adding a movie suggestion
+    - `role`: The price for buying a new role
+    - `token`: This entry will hold your application's token
+
+
+---
 # Main.py
 
 ## Global Variables/Files
@@ -111,6 +144,12 @@ Calls ledger() then closes the client and logs the bot out of discord.
 
 
 
+### role(ctx)
+
+Opens up the wallet, checks if the user can afford it, and updates the roles.
+
+
+
 # Command use
 ---
 
@@ -152,25 +191,3 @@ commands not listed in this section take no arguments and therefore can simply b
     If they all match, the player wins.
 
     *Returns: (winnings or 0), result message, list of numbers rolled*
-
-# Extra Files
-
-## These files aren't included in git for privacy reasons. However they are very necessary so you *will* need to write them.
----
-
-## leveling.json
-- Main keys are user IDs.
-- Each entry holds another dictionary with keys `time`, `xp`, and `level`.
-- `time`: Holds a stringified version of a datetime object containing a time in `"%X"` format.
-- `xp`: Holds a float with the amount of xp accrued.
-
-
-## BankBook.json
-- Main keys are also user IDs
-- Each entry holds another dictionary with keys `"name"` and `"balance"`
-- `"name"`: The individual's display name as a string. Not important but it's there.
-- `"balance"`: The spaghett balance as an int.
-
-
-## token.txt
-Simply for holding the app token.
